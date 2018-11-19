@@ -4,9 +4,8 @@ import sys
 
 def readFloatingPoint(fileIn):
     x = fileIn.read(4)
-    if len(x) < 4:
-        print repr(x), fileIn.read(4).encode('hex'), fileIn.read(4).encode('hex')
-    return struct.unpack('f', x)[0]
+    flt= struct.unpack('f', x)[0]
+    return flt
 
 def readLittleEndian(fileIn):
     return struct.unpack('<i', fileIn.read(4))[0]

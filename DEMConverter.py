@@ -3,8 +3,10 @@ from GridFileReader import readGridFile
 from GridFileWriter import writeGridFile
 from XYZFileReader import readXYZFile
 import sys
+import matplotlib.tri as tri
 import numpy as np
 import pylab as plt
+from scipy.interpolate import griddata
 from scipy.interpolate import RegularGridInterpolator
 
 # https://stackoverflow.com/questions/42275304/changing-data-resolution-in-python
@@ -20,12 +22,14 @@ def regrid(data, out_x, out_y):
 
 def ConvertGridToXYZ(gridfile, xyzfile):
     rows, cols, left, bottom, right, top, griddata = readGridFile(gridfile)
-    gridscale = cols/(right-left)  # scale of each datapoint in grid data (arbitrary units)
     xyzheader= 'x y z\n'
     xyzdata = []
     for y in range(rows):
         for x in range(cols):
-            depth = griddata[y][x]+bottom
+            depth = griddata[y][x]  # +bottom
+            #if abs(depth)>2000:
+                #print griddata[y][x], y, x, bottom
+                #print ""
             lon = (x)+left
             lat = (y)  # no baseline in grid data for lat values, assume they begin at 0
             xyzdata.append((lon, lat, depth))
@@ -34,37 +38,36 @@ def ConvertGridToXYZ(gridfile, xyzfile):
     with open(xyzfile,'w') as fout:
         fout.write(xyzheader)
         for data in xyzdata:
-            fout.write("%f %f %f\n" % data)
+            d1, d2, d3 = data
+            #if abs(d3)>1000:
+            #    print data
+            fout.write("%f %f %f\n" % (d1,d2,d3))
 
 def ConvertXYZToGrid(xyzfile, gridfile):
-    readXYZFile(xyzfile)
+    #readXYZFile(xyzfile)
     # These are constant
     rows = 480
     cols = 640
     xdata, ydata, zdata = readXYZFile(xyzfile)
-    xdata = np.unique(xdata)
-    ydata = np.unique(ydata)
-    X, Y = np.meshgrid(xdata, ydata)
-    Z = zdata.reshape(len(ydata), len(xdata))
-    Z = regrid(Z, cols, rows)  # in case input resolution is not what we want
+    xi = np.linspace(np.min(xdata), np.max(xdata), cols)
+    yi = np.linspace(np.min(ydata), np.max(ydata), rows)
+    Z = griddata((xdata, ydata), zdata, (xi[None, :], yi[:, None]), method='nearest')
     Zmin = np.min(Z)
     Zmax = np.max(Z)
-    Zmargin = (Zmax-Zmin)
     l = 0
     r = 0
-    t = Zmax+Zmargin/2
-    b = Zmin-Zmargin/2
-    header = [rows, cols, l, b, r, t]
-    writeGridFile(gridfile,Z, header)
-    plotter.pcolormesh(X, Y, Z)
+    t = Zmax
+    b = Zmin
+    header = [cols, rows, l, b, r, t]
+    writeGridFile(gridfile, Z, header)
+    plotter.pcolormesh(xi, yi, Z)
     plotter.show()
+    print Zmax, Zmin
     return
 
 if __name__ == "__main__":
     gridfile = sys.argv[1]
     xyzfile = sys.argv[2]
-    mygridfile = 'myLakeTahoe.grid'
-    ConvertGridToXYZ(gridfile, xyzfile)
-    ConvertXYZToGrid(xyzfile, mygridfile)
-    ConvertGridToXYZ(mygridfile, xyzfile)
-    ConvertXYZToGrid(xyzfile, mygridfile)
+    ConvertXYZToGrid(xyzfile, gridfile) #writes bad values (for no reason???)
+    ConvertGridToXYZ(gridfile, 'target.xyz') #reads bad values
+    ConvertXYZToGrid('target.xyz', 'newtarget.grid') #fails
