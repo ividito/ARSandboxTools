@@ -31,7 +31,7 @@ def ConvertGridToXYZ(gridfile, xyzfile):
                 #print griddata[y][x], y, x, bottom
                 #print ""
             lon = (x)+left
-            lat = (y)  # no baseline in grid data for lat values, assume they begin at 0
+            lat = (y)+bottom
             xyzdata.append((lon, lat, depth))
     # This xyz data is valid because: y value is determined by outer loop, x value is ascending in inner loop
     assert len(xyzdata) == rows*cols, "XYZ dimensions do not match grid size"
@@ -54,10 +54,11 @@ def ConvertXYZToGrid(xyzfile, gridfile):
     Z = griddata((xdata, ydata), zdata, (xi[None, :], yi[:, None]), method='nearest')
     Zmin = np.min(Z)
     Zmax = np.max(Z)
-    l = 0
-    r = 0
-    t = Zmax
-    b = Zmin
+    l = np.min(xdata)
+    r = np.max(xdata)
+    t = np.max(ydata)
+    b = np.min(ydata)
+    print l,r,b,t
     header = [cols, rows, l, b, r, t]
     writeGridFile(gridfile, Z, header)
     plotter.pcolormesh(xi, yi, Z)
@@ -70,4 +71,4 @@ if __name__ == "__main__":
     xyzfile = sys.argv[2]
     ConvertXYZToGrid(xyzfile, gridfile) #writes bad values (for no reason???)
     ConvertGridToXYZ(gridfile, 'target.xyz') #reads bad values
-    ConvertXYZToGrid('target.xyz', 'newtarget.grid') #fails
+    ConvertXYZToGrid('target.xyz', 'newtarget.grid')

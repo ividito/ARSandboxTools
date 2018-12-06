@@ -4,8 +4,6 @@ import sys
 def writeFloatingPoint(flt):
     s = struct.pack('1f', flt)
     x = struct.unpack('f', s)[0]
-    if abs(x)>1000:
-        print "large x", flt, repr(s), x
     if len(s)<4:
         print repr(s)
     return s
