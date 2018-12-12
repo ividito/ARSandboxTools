@@ -31,7 +31,6 @@ def writeGridFile(filename, data, headers):
                 fout.write(writeFloatingPoint(col))
 
 if __name__ == '__main__':
-    x = [1.0,14.657,-87.4444, 2.22222]
-    from GridFileReader import readFloatingPoint
+    x = [1.0, 14.657, -87.4444, 2.22222]
     for d in x:
         print struct.unpack('f', (writeFloatingPoint(d)))[0]

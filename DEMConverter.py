@@ -43,7 +43,7 @@ def ConvertGridToXYZ(gridfile, xyzfile):
             #    print data
             fout.write("%f %f %f\n" % (d1,d2,d3))
 
-def ConvertXYZToGrid(xyzfile, gridfile):
+def ConvertXYZToGrid(xyzfile, gridfile, plot=False):
     #readXYZFile(xyzfile)
     # These are constant
     rows = 480
@@ -61,8 +61,9 @@ def ConvertXYZToGrid(xyzfile, gridfile):
     print l,r,b,t
     header = [cols, rows, l, b, r, t]
     writeGridFile(gridfile, Z, header)
-    plotter.pcolormesh(xi, yi, Z)
-    plotter.show()
+    if plot:
+        plotter.pcolormesh(xi, yi, Z)
+        plotter.show()
     print Zmax, Zmin
     return
 
