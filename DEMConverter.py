@@ -43,7 +43,7 @@ def ConvertGridToXYZ(gridfile, xyzfile):
             #    print data
             fout.write("%f %f %f\n" % (d1,d2,d3))
 
-def ConvertXYZToGrid(xyzfile, gridfile, plot=False):
+def ConvertXYZToGrid(xyzfile, gridfile, plot=True):
     #readXYZFile(xyzfile)
     # These are constant
     rows = 480

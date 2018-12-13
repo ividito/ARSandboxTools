@@ -2,6 +2,7 @@ from Tkinter import *
 import tkFileDialog
 import platform
 import DEMConverter as dem
+import InputGraphManager as ig
 
 class Application(Frame):
     def __init__(self, master=None):
@@ -13,11 +14,11 @@ class Application(Frame):
 
     def filetypesel(self):
         if self.filetypevar.get()==1:
-            return 'xyz'
+            self.fileType= 'xyz'
         elif self.filetypevar.get()==2:
-            return 'USGS'
+            self.fileType = 'USGS'
         else:
-            return 'none'
+            self.fileType = 'none'
 
     def inputfilesel(self):  # TODO implement appropriate filetypes based on selection
         self.inputselection = tkFileDialog.askopenfilename(initialdir = "/" if platform.system()=='Linux' else "C:/",title = "Select file",filetypes = (("xyz files","*.xyz"),("all files","*.*")))
@@ -58,10 +59,13 @@ class Application(Frame):
 
         if self.fileType == 'xyz':
             dem.ConvertXYZToGrid(self.inputselection, self.outputFile)
-            #  load inputgraph with outputfile
+            ig.setDemFileName(self.inputgraph, self.outputFile)
         elif self.fileType == 'USGS':
             print "USGS files not implemented"
+        else:
+            print self.fileType
         self.quit()
+
 
     def createWidgets(self):
         self.filetypevar = IntVar()
@@ -75,7 +79,6 @@ class Application(Frame):
         self.usgsSelect = Radiobutton(self, text='USGS', variable=self.filetypevar, value=2, command=self.filetypesel)
         self.usgsSelect.grid(column=0)
         self.noneSelect = Radiobutton(self, text='None (start sandbox normally)', variable=self.filetypevar, value=3, command=self.filetypesel)
-        self.noneSelect.select()
         self.noneSelect.grid(column=0)
 
         self.inputSelectionLabel = Label(self)
