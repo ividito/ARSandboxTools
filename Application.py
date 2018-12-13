@@ -3,6 +3,7 @@ import tkFileDialog
 import platform
 import DEMConverter as dem
 import InputGraphManager as ig
+import os
 
 class Application(Frame):
     def __init__(self, master=None):
@@ -59,7 +60,8 @@ class Application(Frame):
 
         if self.fileType == 'xyz':
             dem.ConvertXYZToGrid(self.inputselection, self.outputFile)
-            ig.setDemFileName(self.inputgraph, self.outputFile)
+            cwd = os.getcwd()
+            ig.setDemFileName(self.inputgraph, cwd+'\\'+self.outputFile)
         elif self.fileType == 'USGS':
             print "USGS files not implemented"
         else:
