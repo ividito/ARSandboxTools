@@ -4,12 +4,14 @@ import platform
 import DEMConverter as dem
 import InputGraphManager as ig
 import os
+import ttk
 
 class Application(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
         self.grid()
         self.createWidgets()
+        self.master.resizable(False, False)
         self.fileType = 'none'
         self.outputFile = 'output.grid'  # TODO add selection
 
@@ -74,32 +76,36 @@ class Application(Frame):
 
         self.filetypeLabel = Label(self)
         self.filetypeLabel.config(text="Select DEM file type")
-        self.filetypeLabel.grid()
+        self.filetypeLabel.grid(column=2)
 
         self.xyzSelect = Radiobutton(self, text='xyz', variable=self.filetypevar, value=1, command=self.filetypesel)
-        self.xyzSelect.grid(column=0)
+        self.xyzSelect.grid(column=2)
         self.usgsSelect = Radiobutton(self, text='USGS', variable=self.filetypevar, value=2, command=self.filetypesel)
-        self.usgsSelect.grid(column=0)
+        self.usgsSelect.grid(column=2)
         self.noneSelect = Radiobutton(self, text='None (start sandbox normally)', variable=self.filetypevar, value=3, command=self.filetypesel)
-        self.noneSelect.grid(column=0)
+        #self.noneSelect.grid(column=0)
 
         self.inputSelectionLabel = Label(self)
-        self.inputSelectionLabel.grid(column=1, row=4, ipadx=10)
+        self.inputSelectionLabel.grid(column=2, row=4, ipadx=10)
         self.inputgraphSelectionLabel = Label(self)
-        self.inputgraphSelectionLabel.grid(column=1, row=5, ipadx=10)
+        self.inputgraphSelectionLabel.grid(column=3, row=5, ipadx=10)
 
         self.inputSelectBtn = Button(self, text='Choose Input DEM', command=self.inputfilesel)
-        self.inputSelectBtn.grid(column=0, row=4)
+        self.inputSelectBtn.grid(column=2, row=4)
         self.inputGraphBtn = Button(self, text='Choose inputgraph', command=self.inputGraphFileSel)
-        self.inputGraphBtn.grid(column=0, row=5)
+        self.inputGraphBtn.grid(column=2, row=5)
 
-        self.startButton = Button(self, text='Start ARSandbox', command=self.convertLoadFile)
-        self.startButton.grid()
+        self.startButton = Button(self, text='Start ARSandbox (Advanced)', command=self.convertLoadFile)
+        self.startButton.grid(column=2, row=6)
         self.errorLabel = Label(self)
-        self.errorLabel.grid(column=1, row=6)
+        self.errorLabel.grid(column=3, row=6)
         self.quitButton = Button(self, text='Quit', command=self.quit)
-        self.quitButton.grid()
+        self.quitButton.grid(column=0, row=5)
+        self.normalStartButton = Button(self, text='Start ARSandbox')
+        self.normalStartButton.grid(column=0, row=3)
 
+        self.seperator = ttk.Separator(self, orient=VERTICAL)
+        self.seperator.grid(column=1,row=0,rowspan=8, sticky='ns', padx=10)
 
 if __name__ == '__main__':
     app = Application()
