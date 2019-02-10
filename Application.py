@@ -5,13 +5,17 @@ import DEMConverter as dem
 import InputGraphManager as ig
 import os
 import ttk
+import matplotlib
+matplotlib.use("TkAgg")
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+from matplotlib.figure import Figure
 
 class Application(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
         self.grid()
         self.createWidgets()
-        self.master.resizable(False, False)
+        #self.master.resizable(False, False)
         self.fileType = 'none'
         self.outputFile = 'output.grid'  # TODO add selection
 
@@ -27,14 +31,24 @@ class Application(Frame):
         self.inputselection = tkFileDialog.askopenfilename(initialdir = "/" if platform.system()=='Linux' else "C:/",title = "Select file",filetypes = (("xyz files","*.xyz"),("all files","*.*")))
         print self.inputselection
         self.inputSelectionLabel.config(text="Input DEM file = "+self.inputselection)
-        self.inputSelectionLabel.grid(column=1, row=4)
+        self.inputSelectionLabel.grid(column=3, row=4)
+
+        xi, yi, Z = dem.ExtractGridFromXYZ(self.inputselection)
+        f = Figure(figsize=(5, 5), dpi=100)
+        a = f.add_subplot(111)
+        a.pcolormesh(xi, yi, Z)
+
+        canvas = FigureCanvasTkAgg(f, self)
+        canvas.show()
+        canvas._tkcanvas.grid(column=3, row=2, rowspan=4)
+
         return
 
     def inputGraphFileSel(self):
         self.inputgraph = tkFileDialog.askopenfilename(initialdir = "/" if platform.system()=='Linux' else "C:/",title = "Select file",filetypes = (("inputgraph files","*.inputgraph"),("all files","*.*")))
         print self.inputgraph
         self.inputgraphSelectionLabel.config(text="Inputgraph file = " + self.inputgraph)
-        self.inputgraphSelectionLabel.grid(column=1, row=5)
+        self.inputgraphSelectionLabel.grid(column=3, row=5)
         return
 
     def attributecheck(self):
@@ -85,8 +99,11 @@ class Application(Frame):
         self.noneSelect = Radiobutton(self, text='None (start sandbox normally)', variable=self.filetypevar, value=3, command=self.filetypesel)
         #self.noneSelect.grid(column=0)
 
+        self.seperator = ttk.Separator(self, orient=VERTICAL)
+        self.seperator.grid(column=1, row=0, rowspan=8, sticky='ns', padx=10)
+
         self.inputSelectionLabel = Label(self)
-        self.inputSelectionLabel.grid(column=2, row=4, ipadx=10)
+        self.inputSelectionLabel.grid(column=3, row=4, ipadx=10)
         self.inputgraphSelectionLabel = Label(self)
         self.inputgraphSelectionLabel.grid(column=3, row=5, ipadx=10)
 
@@ -104,8 +121,7 @@ class Application(Frame):
         self.normalStartButton = Button(self, text='Start ARSandbox')
         self.normalStartButton.grid(column=0, row=3)
 
-        self.seperator = ttk.Separator(self, orient=VERTICAL)
-        self.seperator.grid(column=1,row=0,rowspan=8, sticky='ns', padx=10)
+
 
 if __name__ == '__main__':
     app = Application()

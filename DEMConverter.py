@@ -5,7 +5,7 @@ from XYZFileReader import readXYZFile
 import sys
 import matplotlib.tri as tri
 import numpy as np
-import pylab as plt
+# import pylab as plt
 from scipy.interpolate import griddata
 from scipy.interpolate import RegularGridInterpolator
 
@@ -66,6 +66,17 @@ def ConvertXYZToGrid(xyzfile, gridfile, plot=True):
         plotter.show()
     print Zmax, Zmin
     return
+
+
+def ExtractGridFromXYZ(xyzfile):
+    rows = 480
+    cols = 640
+    xdata, ydata, zdata = readXYZFile(xyzfile)
+    xi = np.linspace(np.min(xdata), np.max(xdata), cols)
+    yi = np.linspace(np.min(ydata), np.max(ydata), rows)
+    Z = griddata((xdata, ydata), zdata, (xi[None, :], yi[:, None]), method='nearest')
+    return xi, yi, Z
+
 
 if __name__ == "__main__":
     gridfile = sys.argv[1]
